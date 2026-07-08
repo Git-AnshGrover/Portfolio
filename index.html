@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ansh | MBA Finance & Compliance Innovator</title>
+  <meta name="description" content="Portfolio of Ansh - MBA Finance graduate specializing in Financial Analysis, Data Analytics, and Internal Audit & Compliance automation using Python and Agentic AI.">
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Three.js Canvas Background -->
+  <div id="canvas-container"></div>
+
+  <!-- Custom Cursor Elements -->
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="custom-cursor-follower" id="cursor-follower"></div>
+
+  <!-- Header Navigation -->
+  <header>
+    <a href="#" class="logo hover-target">ANSH<span>.</span></a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#about" class="hover-target">About</a></li>
+        <li><a href="#experience" class="hover-target">Journey</a></li>
+        <li><a href="#skills" class="hover-target">Skills</a></li>
+        <li><a href="#projects" class="hover-target">Projects</a></li>
+        <li><a href="#contact" class="hover-target">Contact</a></li>
+      </ul>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      <button id="theme-toggle" class="theme-toggle-btn hover-target" aria-label="Toggle Theme">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <a href="../Ansh_CV.pdf" target="_blank" class="nav-cta hover-target">
+        <i class="fa-solid fa-arrow-down-open-text"></i> Resume
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-subtitle">MBA Finance &amp; Analytics</div>
+    <h1 class="hero-title">
+      <span class="name">Hi, I'm Ansh.</span>
+      <span class="tagline" id="hero-tagline">Automating Audits. Optimizing Portfolios.</span>
+    </h1>
+    <p class="hero-desc">
+      A results-driven MBA Finance graduate bridging the gap between high-level financial risk assessment and cutting-edge data automation. Armed with Python scripts, advanced analytics, and Agentic AI, I streamline complex audit controls and drive digital transformations.
+    </p>
+    <div class="hero-actions">
+      <a href="#experience" class="btn btn-primary hover-target">View My Journey <i class="fa-solid fa-arrow-right"></i></a>
+      <a href="#contact" class="btn btn-secondary hover-target">Get In Touch</a>
+    </div>
+    
+    <a href="#about" class="scroll-indicator hover-target">
+      <div class="mouse"><div class="wheel"></div></div>
+      <span>Scroll Down</span>
+    </a>
+  </section>
+
+  <!-- About Section (Bento Grid) -->
+  <section id="about">
+    <h2 class="section-title">About <span>Me</span></h2>
+    <div class="about-bento">
+      
+      <!-- Card 1: Bio -->
+      <div class="glass-card bento-card seven-width">
+        <div>
+          <h3><i class="fa-solid fa-user-tie"></i> Profile Summary</h3>
+          <p>
+            I recently completed my MBA in Finance from IILM University, Gurugram. My professional core lies at the intersection of risk governance and technology. I enjoy dissecting complex regulatory frameworks (such as RBI guidelines) and building custom automation scripts to evaluate compliance controls. 
+          </p>
+          <br>
+          <p>
+            Whether performing risk auditing for Airtel Payments Bank retail channels, developing operations workflows for State Bank of India, or building tax forecasting models, my goal is always to reduce friction, eliminate manual redundancies, and uncover actionable business insights.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Card 2: Micro Stats Dashboard -->
+      <div class="glass-card bento-card five-width">
+        <h3><i class="fa-solid fa-chart-simple"></i> Analytics at a Glance</h3>
+        <div class="stats-container">
+          <div class="stat-item">
+            <span class="stat-number" data-target="264" data-suffix="">0</span>
+            <span class="stat-label">Audits Conducted</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="10000" data-suffix="+">0</span>
+            <span class="stat-label">AI Checklists Generated</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="512" data-suffix="">0</span>
+            <span class="stat-label">Survey Responses</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Interactive Developer Terminal -->
+      <div class="glass-card bento-card full-width">
+        <h3><i class="fa-solid fa-terminal"></i> Antigravity Agentic AI &amp; Python Workspace</h3>
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div class="terminal-dot dot-red"></div>
+            <div class="terminal-dot dot-yellow"></div>
+            <div class="terminal-dot dot-green"></div>
+            <div class="terminal-title">compliance_automation_agent.py</div>
+          </div>
+          <div class="terminal-body">
+            <span class="terminal-prompt">ansh@antigravity:~$</span> <span class="terminal-input">python3 run_audit_validation.py --agent=antigravity</span>
+            <span class="terminal-output">
+[INFO] Initializing Antigravity AI Agent... Connected.<br>
+[INFO] Loading risk data directories for 10,000+ merchant database... Completed.<br>
+[INFO] Executing openpyxl parsing engine on Airtel Payments Bank retail channels...<br>
+[SUCCESS] 264 retail channel audits processed. 10,248 automatic checklists generated.<br>
+[SUCCESS] Identified 142 discrepancies. Risk metrics logged within Betel/BetelNut portal.<br>
+[SUCCESS] Audit-ready directory structured. Evidence indexing complete. Cycle time reduced by 80%.
+            </span>
+            <span class="terminal-prompt">ansh@antigravity:~$</span> <span class="terminal-input">_</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Journey Section (Timeline) -->
+  <section id="experience">
+    <h2 class="section-title">Professional <span>Journey</span></h2>
+    <div class="timeline">
+      
+      <!-- TRPW -->
+      <div class="timeline-item timeline-item-left">
+        <div class="timeline-badge"></div>
+        <div class="glass-card timeline-content hover-target">
+          <span class="timeline-date">Jun 2026 – Present</span>
+          <h3 class="timeline-role">Internal Audit Intern</h3>
+          <span class="timeline-company">TRPW Strategic Partners Private Limited</span>
+          <ul class="timeline-bullets">
+            <li>Conducted risk-based internal control audits for Airtel Payments Bank (APBL) retail channels under RBI guidelines.</li>
+            <li>Co-developed custom Python automation frameworks using `openpyxl` and Agentic AI (Antigravity) to parse and validate retail datasets across 10,000+ outlets, reducing cycle times by 80%.</li>
+            <li>Architected intelligent AI-driven workflows for automated evidence indexing, checklist generation, and audit directory structuring.</li>
+            <li>Conducted remote and physical merchant audits, logging key risk metrics in the Betel/BetelNut compliance management portal.</li>
+          </ul>
+          <div class="timeline-tech">
+            <span class="tech-tag">Agentic AI (Antigravity)</span>
+            <span class="tech-tag">Python (openpyxl)</span>
+            <span class="tech-tag">Betel/BetelNut Portal</span>
+            <span class="tech-tag">RBI Compliance</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SBI -->
+      <div class="timeline-item timeline-item-right">
+        <div class="timeline-badge"></div>
+        <div class="glass-card timeline-content hover-target">
+          <span class="timeline-date">Jun 2025 – Aug 2025</span>
+          <h3 class="timeline-role">Operations Intern</h3>
+          <span class="timeline-company">State Bank of India</span>
+          <ul class="timeline-bullets">
+            <li>Analyzed end-to-end KYC and AML compliance operations against RBI regulatory frameworks to isolate branch bottlenecks.</li>
+            <li>Designed and executed consumer surveying capturing feedback from 345 customers to address operational bottlenecks.</li>
+            <li>Proposed 'EasyKYC' digital framework—a customer-centric workflow to reduce branch footfall and unify KYC channels.</li>
+            <li>Conducted competitive benchmarking against leading private sector banks to identify onboarding best practices.</li>
+          </ul>
+          <div class="timeline-tech">
+            <span class="tech-tag">KYC &amp; AML Compliance</span>
+            <span class="tech-tag">Consumer Surveying</span>
+            <span class="tech-tag">EasyKYC Digital Design</span>
+            <span class="tech-tag">Competitive Benchmarking</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zielhoch -->
+      <div class="timeline-item timeline-item-left">
+        <div class="timeline-badge"></div>
+        <div class="glass-card timeline-content hover-target">
+          <span class="timeline-date">May 2025 – Jul 2025</span>
+          <h3 class="timeline-role">Finance &amp; Marketing Intern</h3>
+          <span class="timeline-company">Zielhoch Pvt. Ltd.</span>
+          <ul class="timeline-bullets">
+            <li>Built dynamic financial models in Excel to forecast post-tax yields across tax-saving vehicles (ELSS, PPF, NPS).</li>
+            <li>Performed comparative yield analyses of investment vehicles aligned with customer risk and income parameters.</li>
+            <li>Analyzed surveying from 167 consumer respondents to identify and isolate critical wealth management behaviors.</li>
+            <li>Constructed dynamic 10+ asset class product matrices mapping risk, return, lock-in, and tax efficiencies.</li>
+          </ul>
+          <div class="timeline-tech">
+            <span class="tech-tag">Financial Modeling</span>
+            <span class="tech-tag">Tax Optimization (ELSS, PPF, NPS)</span>
+            <span class="tech-tag">Excel Analytics</span>
+            <span class="tech-tag">Consumer Behavior Surveying</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paras Institute -->
+      <div class="timeline-item timeline-item-right">
+        <div class="timeline-badge"></div>
+        <div class="glass-card timeline-content hover-target">
+          <span class="timeline-date">Feb 2020 – Jun 2021</span>
+          <h3 class="timeline-role">Coordinator – Admissions &amp; SMM</h3>
+          <span class="timeline-company">Paras Institute of Commerce Pvt. Ltd.</span>
+          <ul class="timeline-bullets">
+            <li>Directed an 11-member social media marketing team, managing content calendars and organic engagement metrics.</li>
+            <li>Supervised the end-to-end student onboarding pipeline, driving enrollment satisfaction and registration efficiency.</li>
+            <li>Produced high-converting creative content matching seasonal campaigns to accelerate student acquisition.</li>
+          </ul>
+          <div class="timeline-tech">
+            <span class="tech-tag">Team Leadership (11 members)</span>
+            <span class="tech-tag">Campaign Strategy</span>
+            <span class="tech-tag">Creative Media Design</span>
+            <span class="tech-tag">Project Coordination</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Skills Grid Section -->
+  <section id="skills">
+    <h2 class="section-title">Skills &amp; <span>Expertise</span></h2>
+    <div class="skills-grid">
+      
+      <!-- Group 1: Finance -->
+      <div class="glass-card skills-card">
+        <div class="skills-card-inner finance">
+          <h3><i class="fa-solid fa-scale-balanced"></i> Finance &amp; Valuation</h3>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Financial Modeling</span><span class="skill-percentage">90%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Tax Optimization (ELSS, PPF, NPS)</span><span class="skill-percentage">85%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Portfolio Asset Allocation</span><span class="skill-percentage">80%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="80%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Banking &amp; KYC Operations</span><span class="skill-percentage">85%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 2: Tech & Analytics -->
+      <div class="glass-card skills-card">
+        <div class="skills-card-inner tech">
+          <h3><i class="fa-solid fa-microchip"></i> Analytics &amp; AI</h3>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Python Scripting (openpyxl)</span><span class="skill-percentage">85%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Agentic AI (Antigravity, Copilot)</span><span class="skill-percentage">95%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="95%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Power BI &amp; DAX Modeling</span><span class="skill-percentage">80%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="80%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Advanced Excel &amp; Data Merging</span><span class="skill-percentage">90%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: Compliance & Audit -->
+      <div class="glass-card skills-card">
+        <div class="skills-card-inner audit">
+          <h3><i class="fa-solid fa-shield-halved"></i> Audit &amp; Controls</h3>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Internal Audit Control Testing</span><span class="skill-percentage">90%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">RBI Regulatory Guidelines</span><span class="skill-percentage">85%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">KYC / AML Compliance</span><span class="skill-percentage">90%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-info"><span class="skill-name">Physical &amp; Virtual Field Auditing</span><span class="skill-percentage">85%</span></div>
+              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Projects Showcase -->
+  <section id="projects">
+    <h2 class="section-title">Key <span>Projects</span></h2>
+    <div class="projects-grid">
+      
+      <!-- Power BI Project -->
+      <div class="glass-card project-card hover-target">
+        <div>
+          <span class="project-badge">Data Visualization &amp; ETL</span>
+          <h3 class="project-title">Student Social Media Addiction Analysis</h3>
+          <p class="project-desc">
+            Sourced, consolidated, and cleaned a custom Kaggle dataset of 705 student records using robust ETL processes. Developed a dynamic data model and mapped screen-time parameters against student GPAs. Designed an interactive Power BI dashboard featuring DAX measures to highlight statistical correlations, formatting insights into executive business-intelligence style reports.
+          </p>
+          
+          <div class="project-visual">
+            <div class="project-visual-grid"></div>
+            <div class="project-visual-line">
+              <svg viewBox="0 0 400 100">
+                <path id="svg-line-path-1" d="M 0,80 Q 80,20 160,50 T 320,10 T 400,90"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-tech">
+          <span class="tech-tag">Power BI</span>
+          <span class="tech-tag">DAX Measures</span>
+          <span class="tech-tag">ETL &amp; Data Cleaning</span>
+          <span class="tech-tag">Statistical Correlation</span>
+        </div>
+      </div>
+
+      <!-- Tax Modeling & Planning -->
+      <div class="glass-card project-card hover-target">
+        <div>
+          <span class="project-badge">Financial Engineering</span>
+          <h3 class="project-title">Dynamic Wealth Optimization Engine</h3>
+          <p class="project-desc">
+            Built an advanced financial spreadsheet comparison matrix and optimization sheet evaluating 10+ asset classes (ELSS, PPF, NPS, mutual funds, debt, equity). Formulated dynamic models to forecast post-tax yields for salaried professionals, matching wealth profiles with income brackets. Incorporated behavioral analysis from 167 consumer respondents to align recommendations with risk thresholds.
+          </p>
+          
+          <div class="project-visual">
+            <div class="project-visual-grid"></div>
+            <div class="project-visual-line">
+              <svg viewBox="0 0 400 100">
+                <path id="svg-line-path-2" d="M 0,90 Q 60,70 120,40 T 240,25 T 400,5"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-tech">
+          <span class="tech-tag">Excel Financial Modeling</span>
+          <span class="tech-tag">Tax Optimization</span>
+          <span class="tech-tag">Asset Allocation</span>
+          <span class="tech-tag">Consumer Insights</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2 class="section-title">Get In <span>Touch</span></h2>
+    <div class="contact-container">
+      
+      <!-- Detail Cards -->
+      <div class="contact-info">
+        <div class="glass-card hover-target" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+          <div class="contact-detail">
+            <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div class="contact-text">
+              <h4>Email Me</h4>
+              <p><a href="mailto:anshgrovermail@gmail.com" class="hover-target">anshgrovermail@gmail.com</a></p>
+            </div>
+          </div>
+          
+          <div class="contact-detail">
+            <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+            <div class="contact-text">
+              <h4>Call Me</h4>
+              <p><a href="tel:+917988288074" class="hover-target">+91 79882 88074</a></p>
+            </div>
+          </div>
+
+          <div class="contact-detail">
+            <div class="contact-icon"><i class="fa-brands fa-linkedin"></i></div>
+            <div class="contact-text">
+              <h4>LinkedIn</h4>
+              <p><a href="https://linkedin.com/in/ansh-grover-b822b31b6" target="_blank" class="hover-target">linkedin.com/in/ansh-grover-b822b31b6</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Compliance Radar Monitor -->
+      <div class="contact-form-container">
+        <div class="glass-card compliance-dashboard hover-target">
+          <div class="dashboard-header">
+            <h3><i class="fa-solid fa-satellite-dish"></i> Risk &amp; Compliance Monitor</h3>
+            <span class="status-badge"><span class="pulse-dot"></span> System Live</span>
+          </div>
+          
+          <div class="dashboard-grid">
+            <!-- Radar Scan Box -->
+            <div class="radar-box">
+              <canvas id="radar-canvas"></canvas>
+            </div>
+            
+            <!-- Risk Grid Box -->
+            <div class="risk-matrix-box">
+              <h4>Risk Matrix (Betel/BetelNut Portal)</h4>
+              <div class="risk-grid">
+                <div class="risk-cell high" title="High Risk">H</div>
+                <div class="risk-cell medium" title="Medium Risk">M</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                
+                <div class="risk-cell medium" title="Medium Risk">M</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell medium" title="Medium Risk">M</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell low" title="Low Risk">L</div>
+                <div class="risk-cell high" title="High Risk">H</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Scan logs terminal style -->
+          <div class="dashboard-logs">
+            <div class="log-line">> [SYSTEM] Active connection to BetelNut compliance gateway...</div>
+            <div class="log-line">> [AUDIT] Running openpyxl automatic validations for 10,000+ outlets...</div>
+            <div class="log-line">> [RBI-KYC] Checking KYC compliance vectors... 264 audits synced.</div>
+            <div class="log-line">> [STATUS] Risk scans active. 0 compliance discrepancies detected.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Ansh. Designed &amp; Coded with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> and <span>Antigravity AI</span>.</p>
+  </footer>
+
+  <!-- CDN scripts: Three.js, GSAP, ScrollTrigger, TextPlugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+  
+  <!-- Custom JS -->
+  <script src="script.js"></script>
+</body>
+</html>
