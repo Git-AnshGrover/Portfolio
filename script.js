@@ -796,7 +796,11 @@ function initSkills3D() {
     });
     const mesh = new THREE.Mesh(sphereGeo, sphereMat);
     mesh.position.copy(node.pos);
-    mesh.userData = { id: node.id, baseColor: node.color };
+    mesh.userData = { 
+      id: node.id, 
+      baseColor: node.color,
+      sphereMat: sphereMat
+    };
     skillsBrainGroup.add(mesh);
     skillsNodeMeshes.push(mesh);
 
@@ -812,6 +816,7 @@ function initSkills3D() {
     });
     const line = new THREE.Line(lineGeom, lineMat);
     skillsBrainGroup.add(line);
+    mesh.userData.lineMat = lineMat;
 
     // Shooting Photon dot along the line
     const photonGeo = new THREE.SphereGeometry(0.045, 8, 8);
@@ -824,6 +829,8 @@ function initSkills3D() {
     skillsBrainGroup.add(photon);
     skillsLinePhotons.push({
       mesh: photon,
+      photonMat: photonMat,
+      baseColor: node.color,
       start: new THREE.Vector3(node.pos.x * 0.25, node.pos.y * 0.25, node.pos.z * 0.25),
       end: node.pos,
       speed: 0.007 + Math.random() * 0.007,
@@ -874,16 +881,52 @@ function initSkills3D() {
       }
     }
 
-    // Adapt blending for theme brightness
+    // Adapt blending and colors for theme brightness
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     if (currentTheme === 'light') {
+      brainMaterial.color.setHex(0x1e293b); // Dark slate-blue to multiply vertex colors (makes them dark and highly visible)
       brainMaterial.blending = THREE.NormalBlending;
-      brainMaterial.opacity = 0.55;
+      brainMaterial.opacity = 0.65;
+      
+      skullMaterial.color.setHex(0x0f766e); // Dark Teal
       skullMaterial.opacity = 0.25;
+
+      // Darken orbiting nodes and lines for light theme readability
+      skillsNodeMeshes.forEach(mesh => {
+        const darkColor = mesh.userData.baseColor === 0xfbbf24 ? 0xb45309 : 0x0891b2;
+        mesh.userData.sphereMat.color.setHex(darkColor);
+        if (mesh.userData.lineMat) {
+          mesh.userData.lineMat.color.setHex(darkColor);
+          mesh.userData.lineMat.opacity = 0.4;
+        }
+      });
+
+      // Darken synapse photons
+      skillsLinePhotons.forEach(p => {
+        const darkColor = p.baseColor === 0xfbbf24 ? 0xb45309 : 0x0f766e;
+        p.photonMat.color.setHex(darkColor);
+      });
     } else {
+      brainMaterial.color.setHex(0xffffff); // Revert to pure original glowing colors
       brainMaterial.blending = THREE.AdditiveBlending;
       brainMaterial.opacity = 0.85;
+      
+      skullMaterial.color.setHex(0x06b6d4); // Glowing neon cyan
       skullMaterial.opacity = 0.35;
+
+      // Revert orbiting nodes and lines to glowing colors for dark theme
+      skillsNodeMeshes.forEach(mesh => {
+        mesh.userData.sphereMat.color.setHex(mesh.userData.baseColor);
+        if (mesh.userData.lineMat) {
+          mesh.userData.lineMat.color.setHex(mesh.userData.baseColor);
+          mesh.userData.lineMat.opacity = 0.2;
+        }
+      });
+
+      // Revert photons to glowing white
+      skillsLinePhotons.forEach(p => {
+        p.photonMat.color.setHex(0xffffff);
+      });
     }
 
     skillsRenderer.render(skillsScene, skillsCamera);
