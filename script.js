@@ -76,28 +76,23 @@ function initThree() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   canvasContainer.appendChild(renderer.domElement);
 
-  // Particles Geometry: 3D Grid fabric representing curved space-time
-  const cols = 50;
-  const rows = 35;
-  const spacing = 1.6;
-  const particleCount = cols * rows;
+  // Particles Geometry
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
-  const initialPositions = []; // save original layout coordinates
+  const velocities = [];
 
-  let index = 0;
-  for (let c = 0; c < cols; c++) {
-    for (let r = 0; r < rows; r++) {
-      const x = (c - cols / 2) * spacing;
-      const y = (r - rows / 2) * spacing;
-      const z = 0;
-      positions[index] = x;
-      positions[index + 1] = y;
-      positions[index + 2] = z;
-      
-      initialPositions.push({ x, y, z });
-      index += 3;
-    }
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    // Random position in a sphere-like shape
+    positions[i] = (Math.random() - 0.5) * 80;
+    positions[i + 1] = (Math.random() - 0.5) * 80;
+    positions[i + 2] = (Math.random() - 0.5) * 80;
+
+    // Velocities
+    velocities.push({
+      x: (Math.random() - 0.5) * 0.05,
+      y: (Math.random() - 0.5) * 0.05,
+      z: (Math.random() - 0.5) * 0.05
+    });
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -115,7 +110,7 @@ function initThree() {
   const texture = new THREE.CanvasTexture(pCanvas);
 
   const material = new THREE.PointsMaterial({
-    size: 0.65,
+    size: 0.6,
     color: 0xfbbf24, // Gold initially
     transparent: true,
     opacity: 0.8,
@@ -135,69 +130,65 @@ function initThree() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  // Animation Loop variables
+  let rotationSpeedX = 0.001;
+  let rotationSpeedY = 0.0015;
+
   function animate() {
     requestAnimationFrame(animate);
 
-    // Track mouse mapping projected into world space coordinates
-    const mouse3D = new THREE.Vector3(
-      (mouseX / window.innerWidth - 0.5) * 65,
-      -(mouseY / window.innerHeight - 0.5) * 38,
-      0
-    );
+    // Dynamic color transition
+    material.color.lerp(targetParticleColor, 0.05);
 
-    // React to mouse movement (slight camera sway)
-    const targetX = (mouseX / window.innerWidth - 0.5) * 12;
-    const targetY = -(mouseY / window.innerHeight - 0.5) * 8;
+    // Slow rotation
+    particleSystem.rotation.x += rotationSpeedX;
+    particleSystem.rotation.y += rotationSpeedY;
+
+    // React to mouse movement
+    const targetX = (mouseX / window.innerWidth - 0.5) * 10;
+    const targetY = -(mouseY / window.innerHeight - 0.5) * 10;
     camera.position.x += (targetX - camera.position.x) * 0.05;
     camera.position.y += (targetY - camera.position.y) * 0.05;
     camera.lookAt(scene.position);
 
-    // Update particle positions: Antigravity Grid warping
+    // Update particle positions based on theme and velocity
     const posAttr = particleSystem.geometry.attributes.position;
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const time = Date.now() * 0.001;
 
     for (let i = 0; i < particleCount; i++) {
       const idx = i * 3;
-      const initP = initialPositions[i];
       
-      // Distance from original grid point to projected mouse target
-      const dx = initP.x - mouse3D.x;
-      const dy = initP.y - mouse3D.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      
-      // Dynamic sine-wave ripple based on original distance to center
-      const distToCenter = Math.sqrt(initP.x * initP.x + initP.y * initP.y);
-      const wave = Math.sin(distToCenter * 0.16 - time * 2.5) * 1.5;
-      
-      let zWarp = wave;
-      let xOffset = 0;
-      let yOffset = 0;
-      
-      const warpRadius = 15.0;
-      if (dist < warpRadius) {
-        const force = (warpRadius - dist) / warpRadius; // 0 to 1
-        zWarp += force * 8.5; // push outward in Z
-        
-        // Push outward in XY directions (Antigravity bubble expansion)
-        const angle = Math.atan2(dy, dx);
-        xOffset = Math.cos(angle) * force * 2.5;
-        yOffset = Math.sin(angle) * force * 2.5;
+      if (currentTheme === 'light') {
+        // --- 3D Snowfall Behavior (Christmas Theme) ---
+        posAttr.array[idx + 1] -= 0.06 + Math.random() * 0.04;
+        posAttr.array[idx] += Math.sin(time + i) * 0.015;
+        posAttr.array[idx + 2] += (Math.random() - 0.5) * 0.01;
+
+        if (posAttr.array[idx + 1] < -40) {
+          posAttr.array[idx + 1] = 40;
+          posAttr.array[idx] = (Math.random() - 0.5) * 80;
+          posAttr.array[idx + 2] = (Math.random() - 0.5) * 80;
+        }
+      } else {
+        // --- Standard Dark Theme Gravity-Free Floating Nodes ---
+        posAttr.array[idx] += velocities[i].x;
+        posAttr.array[idx + 1] += velocities[i].y;
+        posAttr.array[idx + 2] += velocities[i].z;
+
+        // Bounce off bounds
+        if (Math.abs(posAttr.array[idx]) > 40) velocities[i].x *= -1;
+        if (Math.abs(posAttr.array[idx + 1]) > 40) velocities[i].y *= -1;
+        if (Math.abs(posAttr.array[idx + 2]) > 40) velocities[i].z *= -1;
       }
-      
-      posAttr.array[idx] = initP.x + xOffset;
-      posAttr.array[idx + 1] = initP.y + yOffset;
-      posAttr.array[idx + 2] = initP.z + zWarp;
     }
     posAttr.needsUpdate = true;
 
-    // Theme adjustments for background particle grid
+    // Contrast adjustments for background particles based on theme
     if (currentTheme === 'light') {
-      material.color.lerp(new THREE.Color(0x0f766e), 0.05); // Dark Teal
       material.blending = THREE.NormalBlending;
-      material.opacity = 0.55;
+      material.opacity = 0.45;
     } else {
-      material.color.lerp(targetParticleColor, 0.05); // Glowing Gold
       material.blending = THREE.AdditiveBlending;
       material.opacity = 0.8;
     }
