@@ -225,86 +225,86 @@
     </div>
   </section>
 
-  <!-- Skills Grid Section -->
+  <!-- Skills Neural Map Section -->
   <section id="skills">
-    <h2 class="section-title">Skills &amp; <span>Expertise</span></h2>
-    <div class="skills-grid">
+    <h2 class="section-title">Skills &amp; <span>Neural Map</span></h2>
+    <div class="skills-container">
       
-      <!-- Group 1: Finance -->
-      <div class="glass-card skills-card">
-        <div class="skills-card-inner finance">
-          <h3><i class="fa-solid fa-scale-balanced"></i> Finance &amp; Valuation</h3>
-          <div class="skill-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Financial Modeling</span><span class="skill-percentage">90%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
+      <!-- 3D Neural Map Canvas Wrapper -->
+      <div class="skills-3d-wrapper glass-card hover-target">
+        <div id="skills-3d-canvas-container">
+          <canvas id="skills-3d-canvas"></canvas>
+          
+          <!-- Floating Billboard HTML Labels (updated dynamically by script.js) -->
+          <div id="skill-label-1" class="skill-3d-label" data-skill="1">
+            <span class="label-dot finance"></span>
+            <div class="label-text">
+              <h5>Financial Modeling</h5>
+              <p>Valuation &amp; Analytics</p>
             </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Tax Optimization (ELSS, PPF, NPS)</span><span class="skill-percentage">85%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+          </div>
+          <div id="skill-label-2" class="skill-3d-label" data-skill="2">
+            <span class="label-dot finance"></span>
+            <div class="label-text">
+              <h5>Tax Optimization</h5>
+              <p>ELSS &amp; Asset Planning</p>
             </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Portfolio Asset Allocation</span><span class="skill-percentage">80%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="80%"></div></div>
+          </div>
+          <div id="skill-label-3" class="skill-3d-label" data-skill="3">
+            <span class="label-dot finance"></span>
+            <div class="label-text">
+              <h5>Banking &amp; KYC</h5>
+              <p>Risk Auditing</p>
             </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Banking &amp; KYC Operations</span><span class="skill-percentage">85%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+          </div>
+          <div id="skill-label-4" class="skill-3d-label" data-skill="4">
+            <span class="label-dot tech"></span>
+            <div class="label-text">
+              <h5>Python Scripting</h5>
+              <p>openpyxl Automation</p>
+            </div>
+          </div>
+          <div id="skill-label-5" class="skill-3d-label" data-skill="5">
+            <span class="label-dot tech"></span>
+            <div class="label-text">
+              <h5>Agentic AI Systems</h5>
+              <p>Antigravity Workflows</p>
+            </div>
+          </div>
+          <div id="skill-label-6" class="skill-3d-label" data-skill="6">
+            <span class="label-dot tech"></span>
+            <div class="label-text">
+              <h5>Power BI</h5>
+              <p>DAX Data Modeling</p>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Group 2: Tech & Analytics -->
-      <div class="glass-card skills-card">
-        <div class="skills-card-inner tech">
-          <h3><i class="fa-solid fa-microchip"></i> Analytics &amp; AI</h3>
-          <div class="skill-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Python Scripting (openpyxl)</span><span class="skill-percentage">85%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
+      
+      <!-- Skill Detail Sidebar -->
+      <div class="skills-sidebar glass-card hover-target">
+        <div id="skill-detail-default">
+          <div class="detail-icon"><i class="fa-solid fa-brain"></i></div>
+          <h3>Interactive Neural Map</h3>
+          <p>Hover over the glowing 3D nodes orbiting the rotating cyberpunk brain to inspect quantitative metrics, technical tools, and real-world compliance applications.</p>
+        </div>
+        
+        <div id="skill-detail-content" style="display: none;">
+          <h3 id="detail-title">Skill Name</h3>
+          <span class="detail-lobe" id="detail-lobe">Frontal Lobe</span>
+          <div class="detail-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="detail-progress-bar" style="width: 90%;"></div>
             </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Agentic AI (Antigravity, Copilot)</span><span class="skill-percentage">95%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="95%"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Power BI &amp; DAX Modeling</span><span class="skill-percentage">80%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="80%"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Advanced Excel &amp; Data Merging</span><span class="skill-percentage">90%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
-            </div>
+            <span id="detail-percentage">90%</span>
+          </div>
+          <p id="detail-desc">Detailed description of this skill block.</p>
+          <div class="detail-tags" id="detail-tags">
+            <!-- Dynamic tags will insert here -->
           </div>
         </div>
       </div>
-
-      <!-- Group 3: Compliance & Audit -->
-      <div class="glass-card skills-card">
-        <div class="skills-card-inner audit">
-          <h3><i class="fa-solid fa-shield-halved"></i> Audit &amp; Controls</h3>
-          <div class="skill-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Internal Audit Control Testing</span><span class="skill-percentage">90%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">RBI Regulatory Guidelines</span><span class="skill-percentage">85%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">KYC / AML Compliance</span><span class="skill-percentage">90%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="90%"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Physical &amp; Virtual Field Auditing</span><span class="skill-percentage">85%</span></div>
-              <div class="skill-bar-container"><div class="skill-bar" data-width="85%"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      
     </div>
   </section>
 

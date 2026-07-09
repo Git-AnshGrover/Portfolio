@@ -183,9 +183,10 @@ function initThree() {
   animate();
 }
 
-// Initialize ThreeJS particles background
+// Initialize ThreeJS particles background & Skills 3D scene
 try {
   initThree();
+  initSkills3D();
 } catch (err) {
   console.error("Three.js failed to initialize:", err);
 }
@@ -582,4 +583,373 @@ if (radarCanvas) {
   }
   
   drawRadar();
+}
+
+// --- Interactive 3D Skills Neural Map ---
+let skillsScene, skillsCamera, skillsRenderer;
+let skillsBrainGroup;
+let skillsNodeMeshes = [];
+let skillsLinePhotons = [];
+const skillsMouse = new THREE.Vector2();
+const skillsRaycaster = new THREE.Raycaster();
+let activeHoveredSkillId = null;
+
+// Details data matching resume profile
+const skillsData = {
+  '1': {
+    title: 'Financial Modeling & Valuation',
+    lobe: 'Temporal Lobe (Valuation)',
+    percentage: '90%',
+    desc: 'Advanced capability in constructing financial projections, discounted cash flow (DCF) models, LBO assessments, and historical analysis. Expert in structuring complex three-statement integrations.',
+    tags: ['DCF Modeling', 'Valuation', 'Consolidation', 'Corporate Finance']
+  },
+  '2': {
+    title: 'Tax Optimization',
+    lobe: 'Occipital Lobe (Planning)',
+    percentage: '85%',
+    desc: 'Strategic design of tax mitigation roadmaps utilizing legal frameworks (ELSS, PPF, NPS, corporate deductions) to maximize net yields for individual and corporate asset pools.',
+    tags: ['Section 80C', 'ELSS Planning', 'Tax Planning', 'Asset Allocation']
+  },
+  '3': {
+    title: 'Banking & KYC Operations',
+    lobe: 'Cerebellum (Operations & Credit)',
+    percentage: '85%',
+    desc: 'Practical mastery of retail bank control systems, credit assessment matrices, risk underwriting, and strict client KYC compliance audits.',
+    tags: ['Credit Audits', 'KYC Compliance', 'Risk Matrices', 'Retail Banking']
+  },
+  '4': {
+    title: 'Python Automation',
+    lobe: 'Frontal Lobe (Analytics)',
+    percentage: '85%',
+    desc: 'Developing clean scripting architectures using openpyxl, pandas, and regex queries to parse, reconcile, and merge thousands of scattered banking transactions.',
+    tags: ['openpyxl', 'Pandas', 'Scripting', 'Reconciliation']
+  },
+  '5': {
+    title: 'Agentic AI Systems',
+    lobe: 'Frontal Lobe (Cognitive Systems)',
+    percentage: '95%',
+    desc: 'Pioneering custom workflow nodes and automatic compliance checklist triggers utilizing the Google Antigravity SDK to run autonomous multi-merchant database audits.',
+    tags: ['Antigravity SDK', 'LLM Schemas', 'Audit Checklists', 'Workflow Design']
+  },
+  '6': {
+    title: 'Power BI Analytics',
+    lobe: 'Parietal Lobe (Visual Controls)',
+    percentage: '80%',
+    desc: 'Constructing corporate visual intelligence portals by building relational schemas, designing optimized DAX calculators, and modeling data flows.',
+    tags: ['Power BI', 'DAX Formulas', 'ETL Modeling', 'Dashboards']
+  }
+};
+
+function initSkills3D() {
+  const container = document.getElementById('skills-3d-canvas-container');
+  const canvas = document.getElementById('skills-3d-canvas');
+  if (!container || !canvas) return;
+
+  // Scene & Camera
+  skillsScene = new THREE.Scene();
+  skillsCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+  skillsCamera.position.z = 8.0;
+
+  // Renderer
+  skillsRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  skillsRenderer.setSize(container.clientWidth, container.clientHeight);
+  skillsRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Brain Group (holds brain, skull shell, nodes, and lines)
+  skillsBrainGroup = new THREE.Group();
+  skillsScene.add(skillsBrainGroup);
+
+  // 1. Procedural Brain Particles
+  const brainGeom = new THREE.BufferGeometry();
+  const brainPoints = [];
+  const brainColors = [];
+
+  const colorCyan = new THREE.Color(0x06b6d4);
+  const colorGreen = new THREE.Color(0x10b981);
+  const colorGold = new THREE.Color(0xfbbf24);
+
+  // Cerebrum (Hemispheres)
+  for (let i = 0; i < 2000; i++) {
+    const isLeft = Math.random() > 0.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    
+    const rx = 1.0;
+    const ry = 0.8;
+    const rz = 0.8;
+    
+    const perturb = 1.0 + 0.12 * Math.sin(theta * 12) * Math.cos(phi * 12) + 0.04 * Math.sin(theta * 30);
+    
+    let x = rx * Math.sin(phi) * Math.cos(theta) * perturb;
+    let y = ry * Math.cos(phi) * perturb;
+    let z = rz * Math.sin(phi) * Math.sin(theta) * perturb;
+    
+    if (isLeft) x -= 0.12;
+    else x += 0.12;
+    
+    y += 0.2;
+    
+    brainPoints.push(x, y, z);
+    
+    const lerpColor = colorCyan.clone().lerp(isLeft ? colorGreen : colorGold, (y + 0.8) / 1.6);
+    brainColors.push(lerpColor.r, lerpColor.g, lerpColor.b);
+  }
+
+  // Cerebellum (Lower back)
+  for (let i = 0; i < 400; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    const r = 0.45;
+    const perturb = 1.0 + 0.08 * Math.sin(theta * 8) * Math.cos(phi * 8);
+    const x = r * Math.sin(phi) * Math.cos(theta) * perturb;
+    const y = r * Math.cos(phi) * perturb - 0.4;
+    const z = r * Math.sin(phi) * Math.sin(theta) * perturb - 0.35;
+    
+    brainPoints.push(x, y, z);
+    const lerpColor = colorGreen.clone().lerp(colorGold, 0.4);
+    brainColors.push(lerpColor.r, lerpColor.g, lerpColor.b);
+  }
+
+  // Brain Stem (Bottom center)
+  for (let i = 0; i < 200; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = 0.15 * (1 - Math.random() * 0.2);
+    const y = -0.4 - Math.random() * 0.6;
+    const x = r * Math.cos(angle);
+    const z = r * Math.sin(angle) - 0.08;
+    
+    brainPoints.push(x, y, z);
+    brainColors.push(colorGreen.r, colorGreen.g, colorGreen.b);
+  }
+
+  brainGeom.setAttribute('position', new THREE.Float32BufferAttribute(brainPoints, 3));
+  brainGeom.setAttribute('color', new THREE.Float32BufferAttribute(brainColors, 3));
+
+  const brainMaterial = new THREE.PointsMaterial({
+    size: 0.045,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending
+  });
+
+  const brainParticles = new THREE.Points(brainGeom, brainMaterial);
+  skillsBrainGroup.add(brainParticles);
+
+  // 2. Procedural Holographic Skull Shell
+  const skullGeom = new THREE.BufferGeometry();
+  const skullPoints = [];
+  
+  // Cranium: sphere shell
+  for (let i = 0; i < 700; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    const r = 1.65;
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = r * Math.cos(phi) + 0.15;
+    const z = r * Math.sin(phi) * Math.sin(theta);
+    skullPoints.push(x, y, z);
+  }
+  // Jaw
+  for (let i = 0; i < 300; i++) {
+    const y = -0.4 - Math.random() * 0.9;
+    const t = (y + 1.3) / 0.9;
+    const width = 0.65 + t * 0.5;
+    const x = (Math.random() - 0.5) * width;
+    const z = 0.9 + (Math.random() - 0.5) * 0.6 - y * 0.15;
+    skullPoints.push(x, y, z);
+  }
+
+  skullGeom.setAttribute('position', new THREE.Float32BufferAttribute(skullPoints, 3));
+  const skullMaterial = new THREE.PointsMaterial({
+    size: 0.03,
+    color: 0x94a3b8,
+    transparent: true,
+    opacity: 0.12,
+    blending: THREE.AdditiveBlending
+  });
+  const skullParticles = new THREE.Points(skullGeom, skullMaterial);
+  skillsBrainGroup.add(skullParticles);
+
+  // 3. Define Outer Orbiting Skill Nodes
+  const skillNodes = [
+    { id: '1', pos: new THREE.Vector3(-2.6, 1.3, 0.4), color: 0xfbbf24 },
+    { id: '2', pos: new THREE.Vector3(-2.8, -0.4, 0.5), color: 0xfbbf24 },
+    { id: '3', pos: new THREE.Vector3(-2.4, -1.9, 0.4), color: 0xfbbf24 },
+    { id: '4', pos: new THREE.Vector3(2.6, 1.3, 0.4), color: 0x06b6d4 },
+    { id: '5', pos: new THREE.Vector3(2.8, -0.4, 0.5), color: 0x06b6d4 },
+    { id: '6', pos: new THREE.Vector3(2.4, -1.9, 0.4), color: 0x06b6d4 }
+  ];
+
+  skillNodes.forEach(node => {
+    // Glowing sphere mesh
+    const sphereGeo = new THREE.SphereGeometry(0.12, 16, 16);
+    const sphereMat = new THREE.MeshBasicMaterial({
+      color: node.color,
+      transparent: true,
+      opacity: 0.9
+    });
+    const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+    mesh.position.copy(node.pos);
+    mesh.userData = { id: node.id, baseColor: node.color };
+    skillsBrainGroup.add(mesh);
+    skillsNodeMeshes.push(mesh);
+
+    // Glowing connection line
+    const lineGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(node.pos.x * 0.25, node.pos.y * 0.25, node.pos.z * 0.25),
+      node.pos
+    ]);
+    const lineMat = new THREE.LineBasicMaterial({
+      color: node.color,
+      transparent: true,
+      opacity: 0.2
+    });
+    const line = new THREE.Line(lineGeom, lineMat);
+    skillsBrainGroup.add(line);
+
+    // Shooting Photon dot along the line
+    const photonGeo = new THREE.SphereGeometry(0.045, 8, 8);
+    const photonMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1
+    });
+    const photon = new THREE.Mesh(photonGeo, photonMat);
+    skillsBrainGroup.add(photon);
+    skillsLinePhotons.push({
+      mesh: photon,
+      start: new THREE.Vector3(node.pos.x * 0.25, node.pos.y * 0.25, node.pos.z * 0.25),
+      end: node.pos,
+      speed: 0.007 + Math.random() * 0.007,
+      progress: Math.random()
+    });
+  });
+
+  // 4. Billboard Projection & Render loop
+  const tempV = new THREE.Vector3();
+  
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // Rotate brain horizontally
+    skillsBrainGroup.rotation.y += 0.003;
+    
+    // Animate photon travel along synapses
+    skillsLinePhotons.forEach(p => {
+      p.progress += p.speed;
+      if (p.progress > 1.0) p.progress = 0;
+      p.mesh.position.copy(p.start).lerp(p.end, p.progress);
+    });
+
+    // Update billboard labels in screen coordinates
+    skillsNodeMeshes.forEach(mesh => {
+      tempV.setFromMatrixPosition(mesh.matrixWorld);
+      tempV.project(skillsCamera);
+      
+      const x = (tempV.x * 0.5 + 0.5) * container.clientWidth;
+      const y = (-(tempV.y * 0.5) + 0.5) * container.clientHeight;
+      
+      const label = document.getElementById(`skill-label-${mesh.userData.id}`);
+      if (label) {
+        label.style.left = `${x}px`;
+        label.style.top = `${y}px`;
+      }
+    });
+
+    // Handle Raycasting
+    skillsRaycaster.setFromCamera(skillsMouse, skillsCamera);
+    const intersects = skillsRaycaster.intersectObjects(skillsNodeMeshes);
+    
+    if (intersects.length > 0) {
+      const hitMesh = intersects[0].object;
+      const skillId = hitMesh.userData.id;
+      if (activeHoveredSkillId !== skillId) {
+        selectSkillNode(skillId);
+      }
+    }
+
+    // Adapt blending for theme brightness
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    if (currentTheme === 'light') {
+      brainMaterial.blending = THREE.NormalBlending;
+      brainMaterial.opacity = 0.55;
+      skullMaterial.opacity = 0.07;
+    } else {
+      brainMaterial.blending = THREE.AdditiveBlending;
+      brainMaterial.opacity = 0.85;
+      skullMaterial.opacity = 0.12;
+    }
+
+    skillsRenderer.render(skillsScene, skillsCamera);
+  }
+
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize', () => {
+    skillsCamera.aspect = container.clientWidth / container.clientHeight;
+    skillsCamera.updateProjectionMatrix();
+    skillsRenderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
+  // Track mouse coordinates on container
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    skillsMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    skillsMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  });
+
+  // Attach hover/click handlers to HTML labels
+  const labels = document.querySelectorAll('.skill-3d-label');
+  labels.forEach(lbl => {
+    const id = lbl.getAttribute('data-skill');
+    lbl.addEventListener('mouseenter', () => selectSkillNode(id));
+    lbl.addEventListener('click', () => selectSkillNode(id));
+  });
+}
+
+function selectSkillNode(skillId) {
+  activeHoveredSkillId = skillId;
+  
+  const labels = document.querySelectorAll('.skill-3d-label');
+  labels.forEach(lbl => {
+    if (lbl.getAttribute('data-skill') === skillId) {
+      lbl.classList.add('active');
+    } else {
+      lbl.classList.remove('active');
+    }
+  });
+
+  skillsNodeMeshes.forEach(mesh => {
+    if (mesh.userData.id === skillId) {
+      mesh.material.color.setHex(0xffffff);
+      mesh.scale.set(1.5, 1.5, 1.5);
+    } else {
+      mesh.material.color.setHex(mesh.userData.baseColor);
+      mesh.scale.set(1.0, 1.0, 1.0);
+    }
+  });
+
+  const data = skillsData[skillId];
+  if (data) {
+    document.getElementById('skill-detail-default').style.display = 'none';
+    const content = document.getElementById('skill-detail-content');
+    content.style.display = 'flex';
+
+    document.getElementById('detail-title').textContent = data.title;
+    document.getElementById('detail-lobe').textContent = data.lobe;
+    document.getElementById('detail-percentage').textContent = data.percentage;
+    document.getElementById('detail-progress-bar').style.width = data.percentage;
+    document.getElementById('detail-desc').textContent = data.desc;
+
+    const tagsContainer = document.getElementById('detail-tags');
+    tagsContainer.innerHTML = '';
+    data.tags.forEach(tag => {
+      const badge = document.createElement('span');
+      badge.className = 'detail-tag';
+      badge.textContent = tag;
+      tagsContainer.appendChild(badge);
+    });
+  }
 }
