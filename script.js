@@ -50,6 +50,15 @@ let scene, camera, renderer, particles, particleSystem;
 let particleCount = 750;
 let targetParticleColor = new THREE.Color(0xfbbf24); // Start with Gold
 
+// Interactive 3D Skills Neural Map global variables (declared at top to prevent TDZ ReferenceError)
+let skillsScene, skillsCamera, skillsRenderer;
+let skillsBrainGroup;
+let skillsNodeMeshes = [];
+let skillsLinePhotons = [];
+const skillsMouse = new THREE.Vector2();
+const skillsRaycaster = new THREE.Raycaster();
+let activeHoveredSkillId = null;
+
 function initThree() {
   // Scene & Camera
   scene = new THREE.Scene();
@@ -586,13 +595,6 @@ if (radarCanvas) {
 }
 
 // --- Interactive 3D Skills Neural Map ---
-let skillsScene, skillsCamera, skillsRenderer;
-let skillsBrainGroup;
-let skillsNodeMeshes = [];
-let skillsLinePhotons = [];
-const skillsMouse = new THREE.Vector2();
-const skillsRaycaster = new THREE.Raycaster();
-let activeHoveredSkillId = null;
 
 // Details data matching resume profile
 const skillsData = {
@@ -645,14 +647,17 @@ function initSkills3D() {
   const canvas = document.getElementById('skills-3d-canvas');
   if (!container || !canvas) return;
 
+  const width = container.clientWidth || 600;
+  const height = container.clientHeight || 450;
+
   // Scene & Camera
   skillsScene = new THREE.Scene();
-  skillsCamera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+  skillsCamera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
   skillsCamera.position.z = 8.0;
 
   // Renderer
   skillsRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  skillsRenderer.setSize(container.clientWidth, container.clientHeight);
+  skillsRenderer.setSize(width, height);
   skillsRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   // Brain Group (holds brain, skull shell, nodes, and lines)
@@ -762,10 +767,10 @@ function initSkills3D() {
 
   skullGeom.setAttribute('position', new THREE.Float32BufferAttribute(skullPoints, 3));
   const skullMaterial = new THREE.PointsMaterial({
-    size: 0.03,
-    color: 0x94a3b8,
+    size: 0.055,
+    color: 0x06b6d4, // Glowing Cyan
     transparent: true,
-    opacity: 0.12,
+    opacity: 0.35,
     blending: THREE.AdditiveBlending
   });
   const skullParticles = new THREE.Points(skullGeom, skullMaterial);
@@ -874,11 +879,11 @@ function initSkills3D() {
     if (currentTheme === 'light') {
       brainMaterial.blending = THREE.NormalBlending;
       brainMaterial.opacity = 0.55;
-      skullMaterial.opacity = 0.07;
+      skullMaterial.opacity = 0.25;
     } else {
       brainMaterial.blending = THREE.AdditiveBlending;
       brainMaterial.opacity = 0.85;
-      skullMaterial.opacity = 0.12;
+      skullMaterial.opacity = 0.35;
     }
 
     skillsRenderer.render(skillsScene, skillsCamera);
