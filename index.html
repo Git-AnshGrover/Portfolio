@@ -84,7 +84,11 @@
       </div>
       
       <!-- Card 2: Micro Stats Dashboard -->
-      <div class="glass-card bento-card five-width">
+      <div class="glass-card bento-card five-width" style="position: relative;">
+        <!-- Container for 3D DNA Helix (Audit Ledger) -->
+        <div id="about-3d-canvas-container" style="position: absolute; right: 10px; top: 10px; width: 120px; height: 120px; opacity: 0.85; pointer-events: none;">
+          <canvas id="about-3d-canvas" style="width: 100%; height: 100%;"></canvas>
+        </div>
         <h3><i class="fa-solid fa-chart-simple"></i> Analytics at a Glance</h3>
         <div class="stats-container">
           <div class="stat-item">
@@ -362,6 +366,18 @@
           <span class="tech-tag">Tax Optimization</span>
           <span class="tech-tag">Asset Allocation</span>
           <span class="tech-tag">Consumer Insights</span>
+        </div>
+      </div>
+
+      <!-- Card 3: 3D Holographic Database Viewer -->
+      <div class="glass-card project-card hover-target project-3d-card" style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; height: 260px; position: relative; overflow: hidden; padding: 0 !important;">
+        <div id="projects-3d-canvas-container" style="width: 100%; height: 100%; position: relative;">
+          <canvas id="projects-3d-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+          <div style="position: absolute; bottom: 15px; left: 20px; z-index: 10; pointer-events: none;">
+            <span class="project-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">3D Holographic Data Console</span>
+            <h3 style="margin-top: 5px; font-size: 1.1rem; color: var(--text-color);">Interactive Cryptographic Database Blocks</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); max-width: 450px;">Simulating relational schemas, transactional nodes, and model allocations in WebGL.</p>
+          </div>
         </div>
       </div>
 

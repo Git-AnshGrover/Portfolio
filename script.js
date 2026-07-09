@@ -59,6 +59,11 @@ const skillsMouse = new THREE.Vector2();
 const skillsRaycaster = new THREE.Raycaster();
 let activeHoveredSkillId = null;
 
+// Other 3D module global variables
+let aboutScene, aboutCamera, aboutRenderer, aboutHelix;
+let projectsScene, projectsCamera, projectsRenderer, projectsCubeGroup;
+let radarScene, radarCamera, radarRenderer, radarGlobeGroup;
+
 function initThree() {
   // Scene & Camera
   scene = new THREE.Scene();
@@ -71,29 +76,33 @@ function initThree() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   canvasContainer.appendChild(renderer.domElement);
 
-  // Particles Geometry
+  // Particles Geometry: 3D Grid fabric representing curved space-time
+  const cols = 50;
+  const rows = 35;
+  const spacing = 1.6;
+  const particleCount = cols * rows;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
-  const velocities = [];
+  const initialPositions = []; // save original layout coordinates
 
-  for (let i = 0; i < particleCount * 3; i += 3) {
-    // Random position in a sphere-like shape
-    positions[i] = (Math.random() - 0.5) * 80;
-    positions[i + 1] = (Math.random() - 0.5) * 80;
-    positions[i + 2] = (Math.random() - 0.5) * 80;
-
-    // Velocities
-    velocities.push({
-      x: (Math.random() - 0.5) * 0.05,
-      y: (Math.random() - 0.5) * 0.05,
-      z: (Math.random() - 0.5) * 0.05
-    });
+  let index = 0;
+  for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < rows; r++) {
+      const x = (c - cols / 2) * spacing;
+      const y = (r - rows / 2) * spacing;
+      const z = 0;
+      positions[index] = x;
+      positions[index + 1] = y;
+      positions[index + 2] = z;
+      
+      initialPositions.push({ x, y, z });
+      index += 3;
+    }
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-  // Particle Material (Glowing circle texture)
-  // Create a canvas-based circular gradient texture for beautiful particles
+  // Particle Material (Glowing circular texture)
   const pCanvas = document.createElement('canvas');
   pCanvas.width = 16;
   pCanvas.height = 16;
@@ -106,7 +115,7 @@ function initThree() {
   const texture = new THREE.CanvasTexture(pCanvas);
 
   const material = new THREE.PointsMaterial({
-    size: 0.6,
+    size: 0.65,
     color: 0xfbbf24, // Gold initially
     transparent: true,
     opacity: 0.8,
@@ -126,65 +135,72 @@ function initThree() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // Animation Loop variables
-  let rotationSpeedX = 0.001;
-  let rotationSpeedY = 0.0015;
-
   function animate() {
     requestAnimationFrame(animate);
 
-    // Dynamic color transition
-    material.color.lerp(targetParticleColor, 0.05);
+    // Track mouse mapping projected into world space coordinates
+    const mouse3D = new THREE.Vector3(
+      (mouseX / window.innerWidth - 0.5) * 65,
+      -(mouseY / window.innerHeight - 0.5) * 38,
+      0
+    );
 
-    // Slow rotation
-    particleSystem.rotation.x += rotationSpeedX;
-    particleSystem.rotation.y += rotationSpeedY;
-
-    // React to mouse movement
-    const targetX = (mouseX / window.innerWidth - 0.5) * 10;
-    const targetY = -(mouseY / window.innerHeight - 0.5) * 10;
+    // React to mouse movement (slight camera sway)
+    const targetX = (mouseX / window.innerWidth - 0.5) * 12;
+    const targetY = -(mouseY / window.innerHeight - 0.5) * 8;
     camera.position.x += (targetX - camera.position.x) * 0.05;
     camera.position.y += (targetY - camera.position.y) * 0.05;
     camera.lookAt(scene.position);
 
-    // Update particle positions based on theme and velocity
+    // Update particle positions: Antigravity Grid warping
     const posAttr = particleSystem.geometry.attributes.position;
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     const time = Date.now() * 0.001;
 
     for (let i = 0; i < particleCount; i++) {
       const idx = i * 3;
+      const initP = initialPositions[i];
       
-      if (currentTheme === 'light') {
-        // --- 3D Snowfall Behavior (Christmas Theme) ---
-        // Fall down
-        posAttr.array[idx + 1] -= 0.06 + Math.random() * 0.04;
+      // Distance from original grid point to projected mouse target
+      const dx = initP.x - mouse3D.x;
+      const dy = initP.y - mouse3D.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      // Dynamic sine-wave ripple based on original distance to center
+      const distToCenter = Math.sqrt(initP.x * initP.x + initP.y * initP.y);
+      const wave = Math.sin(distToCenter * 0.16 - time * 2.5) * 1.5;
+      
+      let zWarp = wave;
+      let xOffset = 0;
+      let yOffset = 0;
+      
+      const warpRadius = 15.0;
+      if (dist < warpRadius) {
+        const force = (warpRadius - dist) / warpRadius; // 0 to 1
+        zWarp += force * 8.5; // push outward in Z
         
-        // Sway gently left & right (sine wind function)
-        posAttr.array[idx] += Math.sin(time + i) * 0.015;
-        
-        // Random drift in depth
-        posAttr.array[idx + 2] += (Math.random() - 0.5) * 0.01;
-
-        // Reset to top if it goes off bottom screen boundary
-        if (posAttr.array[idx + 1] < -40) {
-          posAttr.array[idx + 1] = 40;
-          posAttr.array[idx] = (Math.random() - 0.5) * 80;
-          posAttr.array[idx + 2] = (Math.random() - 0.5) * 80;
-        }
-      } else {
-        // --- Standard Dark Theme Gravity-Free Floating Nodes ---
-        posAttr.array[idx] += velocities[i].x;
-        posAttr.array[idx + 1] += velocities[i].y;
-        posAttr.array[idx + 2] += velocities[i].z;
-
-        // Bounce off bounds
-        if (Math.abs(posAttr.array[idx]) > 40) velocities[i].x *= -1;
-        if (Math.abs(posAttr.array[idx + 1]) > 40) velocities[i].y *= -1;
-        if (Math.abs(posAttr.array[idx + 2]) > 40) velocities[i].z *= -1;
+        // Push outward in XY directions (Antigravity bubble expansion)
+        const angle = Math.atan2(dy, dx);
+        xOffset = Math.cos(angle) * force * 2.5;
+        yOffset = Math.sin(angle) * force * 2.5;
       }
+      
+      posAttr.array[idx] = initP.x + xOffset;
+      posAttr.array[idx + 1] = initP.y + yOffset;
+      posAttr.array[idx + 2] = initP.z + zWarp;
     }
     posAttr.needsUpdate = true;
+
+    // Theme adjustments for background particle grid
+    if (currentTheme === 'light') {
+      material.color.lerp(new THREE.Color(0x0f766e), 0.05); // Dark Teal
+      material.blending = THREE.NormalBlending;
+      material.opacity = 0.55;
+    } else {
+      material.color.lerp(targetParticleColor, 0.05); // Glowing Gold
+      material.blending = THREE.AdditiveBlending;
+      material.opacity = 0.8;
+    }
 
     renderer.render(scene, camera);
   }
@@ -196,6 +212,8 @@ function initThree() {
 try {
   initThree();
   initSkills3D();
+  initAbout3D();
+  initProjects3D();
 } catch (err) {
   console.error("Three.js failed to initialize:", err);
 }
@@ -487,111 +505,11 @@ cardsToTilt.forEach(card => {
   });
 });
 
-// --- Radar Scan Animation ---
-const radarCanvas = document.getElementById('radar-canvas');
-if (radarCanvas) {
-  const ctx = radarCanvas.getContext('2d');
-  
-  // Set dimensions
-  radarCanvas.width = 300;
-  radarCanvas.height = 180;
-  
-  const width = radarCanvas.width;
-  const height = radarCanvas.height;
-  const cx = width / 2;
-  const cy = height / 2;
-  const maxRadius = Math.min(cx, cy) - 8;
-  
-  let angle = 0;
-  
-  // Fake targets: random angle and distance
-  const targets = [];
-  for (let i = 0; i < 4; i++) {
-    targets.push({
-      angle: Math.random() * Math.PI * 2,
-      distance: 20 + Math.random() * (maxRadius - 30),
-      alpha: 0
-    });
-  }
-  
-  function drawRadar() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    
-    // Clear with slight transparency to leave tails
-    ctx.fillStyle = currentTheme === 'light' ? 'rgba(248, 250, 252, 0.15)' : 'rgba(10, 11, 16, 0.15)';
-    ctx.fillRect(0, 0, width, height);
-    
-    const baseColor = currentTheme === 'light' ? '#047857' : '#10b981'; // Emerald
-    ctx.strokeStyle = currentTheme === 'light' ? 'rgba(4, 120, 87, 0.12)' : 'rgba(16, 185, 129, 0.12)';
-    ctx.lineWidth = 1;
-    
-    // Draw concentric circles
-    ctx.beginPath();
-    ctx.arc(cx, cy, maxRadius, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, maxRadius * 0.65, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, maxRadius * 0.3, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    // Draw cross axes
-    ctx.beginPath();
-    ctx.moveTo(cx - maxRadius, cy);
-    ctx.lineTo(cx + maxRadius, cy);
-    ctx.moveTo(cx, cy - maxRadius);
-    ctx.lineTo(cx, cy + maxRadius);
-    ctx.stroke();
-    
-    // Draw sweeping line
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    const sx = cx + Math.cos(angle) * maxRadius;
-    const sy = cy + Math.sin(angle) * maxRadius;
-    ctx.lineTo(sx, sy);
-    
-    const sweepGrad = ctx.createLinearGradient(cx, cy, sx, sy);
-    sweepGrad.addColorStop(0, baseColor);
-    sweepGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-    ctx.strokeStyle = sweepGrad;
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-    
-    // Draw targets
-    targets.forEach(t => {
-      const tx = cx + Math.cos(t.angle) * t.distance;
-      const ty = cy + Math.sin(t.angle) * t.distance;
-      
-      const diff = Math.abs(angle - t.angle) % (Math.PI * 2);
-      if (diff < 0.08) {
-        t.alpha = 1.0;
-      }
-      
-      if (t.alpha > 0) {
-        ctx.beginPath();
-        ctx.arc(tx, ty, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = currentTheme === 'light' ? `rgba(186, 24, 27, ${t.alpha})` : `rgba(251, 191, 36, ${t.alpha})`;
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.arc(tx, ty, 8 * (1 - t.alpha + 0.1), 0, Math.PI * 2);
-        ctx.strokeStyle = currentTheme === 'light' ? `rgba(186, 24, 27, ${t.alpha * 0.4})` : `rgba(251, 191, 36, ${t.alpha * 0.4})`;
-        ctx.stroke();
-        
-        t.alpha -= 0.008;
-      }
-    });
-    
-    angle += 0.015;
-    if (angle > Math.PI * 2) angle = 0;
-    
-    requestAnimationFrame(drawRadar);
-  }
-  
-  drawRadar();
+// --- Radar Scan Animation: 3D Global Threat & Audit Sphere ---
+try {
+  initRadar3D();
+} catch (err) {
+  console.error("3D Radar failed to initialize:", err);
 }
 
 // --- Interactive 3D Skills Neural Map ---
@@ -1000,4 +918,322 @@ function selectSkillNode(skillId) {
       tagsContainer.appendChild(badge);
     });
   }
+}
+
+function initAbout3D() {
+  const container = document.getElementById('about-3d-canvas-container');
+  const canvas = document.getElementById('about-3d-canvas');
+  if (!container || !canvas) return;
+
+  const width = container.clientWidth || 120;
+  const height = container.clientHeight || 120;
+
+  aboutScene = new THREE.Scene();
+  aboutCamera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+  aboutCamera.position.z = 4.2;
+
+  aboutRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  aboutRenderer.setSize(width, height);
+  aboutRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  aboutHelix = new THREE.Group();
+  aboutScene.add(aboutHelix);
+
+  // Generate double helix points
+  const geom = new THREE.BufferGeometry();
+  const positions = [];
+  
+  const strandCount = 45;
+  for (let i = 0; i < strandCount; i++) {
+    const t = (i / strandCount) * Math.PI * 4.5; // helix twisting
+    const y = (i / strandCount) * 2.2 - 1.1;     // height range from -1.1 to 1.1
+    
+    // Strand 1
+    const x1 = Math.cos(t) * 0.55;
+    const z1 = Math.sin(t) * 0.55;
+    positions.push(x1, y, z1);
+    
+    // Strand 2
+    const x2 = Math.cos(t + Math.PI) * 0.55;
+    const z2 = Math.sin(t + Math.PI) * 0.55;
+    positions.push(x2, y, z2);
+  }
+
+  // Draw connecting rung line segments
+  const rungsGeom = new THREE.BufferGeometry();
+  const rungPositions = [];
+  for (let i = 0; i < strandCount; i += 3) {
+    const t = (i / strandCount) * Math.PI * 4.5;
+    const y = (i / strandCount) * 2.2 - 1.1;
+    
+    const x1 = Math.cos(t) * 0.55;
+    const z1 = Math.sin(t) * 0.55;
+    const x2 = Math.cos(t + Math.PI) * 0.55;
+    const z2 = Math.sin(t + Math.PI) * 0.55;
+    
+    rungPositions.push(x1, y, z1);
+    rungPositions.push(x2, y, z2);
+  }
+  rungsGeom.setAttribute('position', new THREE.Float32BufferAttribute(rungPositions, 3));
+  const rungMat = new THREE.LineBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.35 });
+  const rungLines = new THREE.LineSegments(rungsGeom, rungMat);
+  aboutHelix.add(rungLines);
+
+  geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  const helixMat = new THREE.PointsMaterial({
+    size: 0.08,
+    color: 0x10b981, // Emerald initially
+    transparent: true,
+    opacity: 0.95
+  });
+  
+  const helixPoints = new THREE.Points(geom, helixMat);
+  aboutHelix.add(helixPoints);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    aboutHelix.rotation.y += 0.015;
+    aboutHelix.rotation.x = 0.15; // slight forward tilt
+    
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    if (currentTheme === 'light') {
+      helixMat.color.setHex(0x047857); // Dark green
+      rungMat.color.setHex(0x047857);
+    } else {
+      helixMat.color.setHex(0x10b981); // Emerald
+      rungMat.color.setHex(0x10b981);
+    }
+
+    aboutRenderer.render(aboutScene, aboutCamera);
+  }
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || 120;
+    const h = container.clientHeight || 120;
+    aboutCamera.aspect = w / h;
+    aboutCamera.updateProjectionMatrix();
+    aboutRenderer.setSize(w, h);
+  });
+}
+
+function initProjects3D() {
+  const container = document.getElementById('projects-3d-canvas-container');
+  const canvas = document.getElementById('projects-3d-canvas');
+  if (!container || !canvas) return;
+
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 260;
+
+  projectsScene = new THREE.Scene();
+  projectsCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  projectsCamera.position.z = 5.2;
+
+  projectsRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  projectsRenderer.setSize(width, height);
+  projectsRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  projectsCubeGroup = new THREE.Group();
+  projectsScene.add(projectsCubeGroup);
+
+  // Generate 3 wireframe cubes in a row representing database blocks
+  const cubes = [];
+  const cubeCount = 3;
+  const colors = [0xfbbf24, 0x06b6d4, 0x10b981];
+
+  for (let i = 0; i < cubeCount; i++) {
+    const geom = new THREE.BoxGeometry(1.1, 1.1, 1.1);
+    const wireframe = new THREE.EdgesGeometry(geom);
+    const lineMat = new THREE.LineBasicMaterial({ 
+      color: colors[i], 
+      transparent: true, 
+      opacity: 0.65,
+      linewidth: 1.5
+    });
+    const line = new THREE.LineSegments(wireframe, lineMat);
+    line.position.x = (i - 1) * 2.3;
+    
+    // Add internal floating data points
+    const pointsGeom = new THREE.BufferGeometry();
+    const pointsPos = [];
+    for (let p = 0; p < 35; p++) {
+      pointsPos.push(
+        (Math.random() - 0.5) * 0.9,
+        (Math.random() - 0.5) * 0.9,
+        (Math.random() - 0.5) * 0.9
+      );
+    }
+    pointsGeom.setAttribute('position', new THREE.Float32BufferAttribute(pointsPos, 3));
+    const pointsMat = new THREE.PointsMaterial({
+      size: 0.05,
+      color: colors[i],
+      transparent: true,
+      opacity: 0.9
+    });
+    const pts = new THREE.Points(pointsGeom, pointsMat);
+    line.add(pts);
+
+    projectsCubeGroup.add(line);
+    cubes.push({ line, lineMat, pointsMat, baseColor: colors[i] });
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    
+    cubes.forEach((cube, idx) => {
+      cube.line.rotation.y += 0.008 * (idx + 1);
+      cube.line.rotation.x += 0.005;
+      
+      if (theme === 'light') {
+        const darkColors = [0xb45309, 0x0891b2, 0x047857];
+        cube.lineMat.color.setHex(darkColors[idx]);
+        cube.pointsMat.color.setHex(darkColors[idx]);
+      } else {
+        cube.lineMat.color.setHex(cube.baseColor);
+        cube.pointsMat.color.setHex(cube.baseColor);
+      }
+    });
+
+    projectsRenderer.render(projectsScene, projectsCamera);
+  }
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth || 800;
+    const h = container.clientHeight || 260;
+    projectsCamera.aspect = w / h;
+    projectsCamera.updateProjectionMatrix();
+    projectsRenderer.setSize(w, h);
+  });
+}
+
+function initRadar3D() {
+  const canvas = document.getElementById('radar-canvas');
+  if (!canvas) return;
+
+  const parent = canvas.parentElement;
+  const width = parent.clientWidth || 300;
+  const height = 180;
+
+  radarScene = new THREE.Scene();
+  radarCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  radarCamera.position.z = 4.0;
+
+  radarRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  radarRenderer.setSize(width, height);
+  radarRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  radarGlobeGroup = new THREE.Group();
+  radarScene.add(radarGlobeGroup);
+
+  // 1. Globe wireframe sphere
+  const sphereGeo = new THREE.SphereGeometry(1.2, 16, 16);
+  const sphereWire = new THREE.EdgesGeometry(sphereGeo);
+  const globeMat = new THREE.LineBasicMaterial({
+    color: 0x10b981, // Emerald initially
+    transparent: true,
+    opacity: 0.16
+  });
+  const globe = new THREE.LineSegments(sphereWire, globeMat);
+  radarGlobeGroup.add(globe);
+
+  // 2. Audit location points on sphere surface
+  const auditPointsPos = [];
+  const auditPointCount = 8;
+  const targetCoords = [];
+  
+  for (let i = 0; i < auditPointCount; i++) {
+    const lat = (Math.random() - 0.5) * Math.PI;
+    const lon = Math.random() * Math.PI * 2;
+    const r = 1.2;
+    const x = r * Math.cos(lat) * Math.cos(lon);
+    const y = r * Math.sin(lat);
+    const z = r * Math.cos(lat) * Math.sin(lon);
+    auditPointsPos.push(x, y, z);
+    
+    targetCoords.push({
+      pos: new THREE.Vector3(x, y, z),
+      mesh: null,
+      pulse: 0,
+      state: Math.random() > 0.35 ? 'compliant' : 'flagged' // compliant (green) or flagged (red/gold)
+    });
+  }
+  
+  // Add target meshes
+  const targetMatGreen = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.85 });
+  const targetMatRed = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.85 });
+  
+  targetCoords.forEach(tc => {
+    const tGeo = new THREE.SphereGeometry(0.065, 8, 8);
+    const tMesh = new THREE.Mesh(tGeo, tc.state === 'compliant' ? targetMatGreen : targetMatRed);
+    tMesh.position.copy(tc.pos);
+    radarGlobeGroup.add(tMesh);
+    tc.mesh = tMesh;
+  });
+
+  // 3. Sweeping horizontal scanner plane
+  const scanGeom = new THREE.RingGeometry(1.2, 1.22, 32);
+  const scanMat = new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
+  const scanner = new THREE.Mesh(scanGeom, scanMat);
+  scanner.rotation.x = Math.PI / 2;
+  radarGlobeGroup.add(scanner);
+
+  let scanDirection = 1;
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    // Rotate globe
+    radarGlobeGroup.rotation.y += 0.005;
+    radarGlobeGroup.rotation.x = 0.2; // slight tilt
+    
+    // Move scan plane up and down
+    scanner.position.y += 0.015 * scanDirection;
+    if (scanner.position.y > 1.2) scanDirection = -1;
+    if (scanner.position.y < -1.2) scanDirection = 1;
+    
+    // Animate target pulse/flash
+    targetCoords.forEach(tc => {
+      if (Math.abs(scanner.position.y - tc.pos.y) < 0.15) {
+        tc.pulse = 1.0;
+      }
+      if (tc.pulse > 0) {
+        tc.mesh.scale.setScalar(1.0 + tc.pulse * 1.5);
+        tc.mesh.material.opacity = tc.pulse;
+        tc.pulse -= 0.025;
+      } else {
+        tc.mesh.scale.setScalar(1.0);
+        tc.mesh.material.opacity = 0.4;
+      }
+    });
+
+    // Theme adjustments
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    if (theme === 'light') {
+      globeMat.color.setHex(0x047857);
+      scanMat.color.setHex(0x047857);
+      targetMatGreen.color.setHex(0x047857);
+      targetMatRed.color.setHex(0xb91c1c); // Dark red
+    } else {
+      globeMat.color.setHex(0x10b981);
+      scanMat.color.setHex(0x10b981);
+      targetMatGreen.color.setHex(0x10b981);
+      targetMatRed.color.setHex(0xef4444); // Neon red
+    }
+
+    radarRenderer.render(radarScene, radarCamera);
+  }
+  animate();
+  
+  // resize
+  window.addEventListener('resize', () => {
+    const w = parent.clientWidth || 300;
+    const h = 180;
+    radarCamera.aspect = w / h;
+    radarCamera.updateProjectionMatrix();
+    radarRenderer.setSize(w, h);
+  });
 }
